@@ -14,7 +14,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt \
  && pip uninstall -y pip
 
-COPY . .
+# Bara det appen behöver. Med COPY . . följde bl.a. Falcos regler och
+# undantag, workflows och skript för kubeconfig med i imagen (F62).
+COPY wsgi.py .
+COPY src/ src/
 
 ENV PYTHONPATH=/app/src
 ENV FLASK_APP=company_website
