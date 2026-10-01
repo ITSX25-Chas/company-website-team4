@@ -13,6 +13,8 @@ spec:
         app: company-website
         git.commit: ${GIT_COMMIT}
     spec:
+      # Appen anropar aldrig Kubernetes API och behöver ingen token (F35).
+      automountServiceAccountToken: false
       # Samma användare som i Dockerfile. Volymens filer måste ägas av
       # 10001, se docs/workshop-4.md, punkt 9 (F23).
       securityContext:
