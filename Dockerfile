@@ -19,6 +19,15 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY wsgi.py .
 COPY src/ src/
 
+# Appen körs som en egen användare utan rättigheter i imagen (F23). UID:t
+# är fast, så att k8s/deployment.yaml och volymens ägare kan använda det.
+# /app/data skapas här, så att en ny Docker-volym får rätt ägare.
+RUN groupadd --system --gid 10001 app \
+ && useradd --system --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app \
+ && mkdir -p /app/data \
+ && chown app:app /app/data
+USER 10001:10001
+
 ENV PYTHONPATH=/app/src
 ENV FLASK_APP=company_website
 
