@@ -93,6 +93,11 @@ def email_preview(id):
 @main_bp.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile(id):
+    # Bara ägaren får se och ändra sin profil. Formuläret visar även
+    # internal_notes, som inte ska synas för andra (F19).
+    if str(current_user.id) != str(id):
+        return "Forbidden", 403
+
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
