@@ -18,6 +18,13 @@ on:
       - "k8s/scanner/**"
       - ".github/workflows/scanner-image.yml"
 
+# En deploy i taget. Två merge:ar i tät följd får annars två deployer som kör
+# samtidigt, och den som blir klar sist vinner, även om den är äldst (F57).
+# Pågående körningar avbryts inte, så varje merge byggs, signeras och deployas.
+concurrency:
+  group: deploy-k3s
+  cancel-in-progress: false
+
 env:
   IMAGE_REPO: ghcr.io/${{ github.repository }}
 
