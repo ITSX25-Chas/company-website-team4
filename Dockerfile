@@ -21,4 +21,6 @@ ENV FLASK_APP=company_website
 
 EXPOSE 7000
 
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:7000", "--access-logfile", "-", "wsgi:app"]
+# --preload: appen, och därmed migreringarna, laddas en gång innan workers
+# startas. Utan den kör båda workers samma migrering samtidigt.
+CMD ["gunicorn", "--preload", "-w", "2", "-b", "0.0.0.0:7000", "--access-logfile", "-", "wsgi:app"]

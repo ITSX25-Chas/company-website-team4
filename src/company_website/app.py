@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 
+from .cli import set_password_command
 from .config import Config
 from .db import init_db, remove_legacy_db
 from .auth import auth_bp, login_manager
@@ -30,6 +31,7 @@ def create_app():
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.cli.add_command(set_password_command)
 
     init_db()
     remove_legacy_db()
