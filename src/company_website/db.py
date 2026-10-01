@@ -11,12 +11,6 @@ def get_db():
     return conn
 
 
-def get_legacy_db():
-    conn = sqlite3.connect(Config.LEGACY_AUTH_DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 def init_db():
     os.makedirs(os.path.dirname(Config.DATABASE), exist_ok=True)
     conn = get_db()
@@ -47,31 +41,11 @@ def init_db():
     conn.close()
 
 
-def init_legacy_db():
-    if os.path.exists(Config.LEGACY_AUTH_DATABASE):
-        return
-    os.makedirs(os.path.dirname(Config.LEGACY_AUTH_DATABASE), exist_ok=True)
-
-    legacy_conn = get_legacy_db()
-    legacy_cursor = legacy_conn.cursor()
-
-    legacy_migration_dir = os.path.join(os.path.dirname(__file__), 'migrations', 'legacy')
-    migration_files = sorted(glob.glob(os.path.join(legacy_migration_dir, '*.sql')))
-
-    for filepath in migration_files:
-        with open(filepath, 'r') as f:
-            legacy_cursor.executescript(f.read())
-
-    main_conn = get_db()
-    main_cursor = main_conn.cursor()
-    main_cursor.execute("SELECT id, username, password_hash FROM users")
-
-    for row in main_cursor.fetchall():
-        legacy_cursor.execute(
-            "INSERT OR REPLACE INTO legacy_users (id, username, password_hash) VALUES (?, ?, ?)",
-            (row['id'], row['username'], row['password_hash'])
-        )
-
-    legacy_conn.commit()
-    main_conn.close()
-    legacy_conn.close()
+def remove_legacy_db():
+    # legacy_auth.db var en kopia av alla lösenordshashar för den gamla
+    # inloggningen (F16, F20). Den används inte längre och ska inte ligga
+    # kvar på volymen. Flera workers kan starta samtidigt, därav except.
+    try:
+        os.remove(Config.LEGACY_AUTH_DATABASE)
+    except FileNotFoundError:
+        pass
