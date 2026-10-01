@@ -84,7 +84,9 @@ def login():
     return render_template('login.html')
 
 
-@auth_bp.route('/logout')
+# POST, så att utloggningen skyddas av CSRF-token. Via GET kunde vilken sida
+# som helst logga ut användaren med en bild eller länk (F21).
+@auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()

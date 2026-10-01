@@ -1,3 +1,5 @@
+import re
+
 from werkzeug.security import generate_password_hash
 
 from company_website.db import get_db
@@ -22,8 +24,16 @@ def user_id(username):
     return row['id']
 
 
+def csrf_token(client):
+    # Varje sida har ett formulär med token: inloggningen eller utloggningen.
+    html = client.get('/').get_data(as_text=True)
+    return re.search(r'name="csrf_token" value="([^"]+)"', html).group(1)
+
+
 def post(client, url, data=None):
-    return client.post(url, data=data or {})
+    data = dict(data or {})
+    data['csrf_token'] = csrf_token(client)
+    return client.post(url, data=data)
 
 
 def login(client, username, password=PASSWORD):

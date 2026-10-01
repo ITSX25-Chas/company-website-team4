@@ -8,6 +8,7 @@
     <p>Editing profile for <strong>{{ user.first_name }} {{ user.last_name }}</strong> ({{ user.username }})</p>
 
     <form id="profileEditForm" method="POST" action="{{ url_for('main.edit_profile', id=user.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label class="form-label" for="first_name">First Name</label>
             <input class="form-input" type="text" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
@@ -64,6 +65,7 @@
             emailPreviewContent.textContent = '';
             const previewData = new FormData();
             previewData.append('email_template', emailSignatureInput.value);
+            previewData.append('csrf_token', document.querySelector('#profileEditForm [name=csrf_token]').value);
 
             try {
                 const response = await fetch(previewSignatureButton.dataset.previewUrl, {
