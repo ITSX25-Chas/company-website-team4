@@ -1,4 +1,10 @@
-from company_website import create_app
+from dotenv import load_dotenv
+
+# Läser .env vid lokal körning (python wsgi.py). I imagen finns ingen .env,
+# och värden som redan finns i miljön skrivs inte över.
+load_dotenv()
+
+from company_website import create_app  # noqa: E402
 
 app = create_app()
 

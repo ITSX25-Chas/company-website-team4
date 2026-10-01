@@ -23,6 +23,13 @@ spec:
         env:
         - name: FLASK_DEBUG
           value: "false"
+        # Secreten skapas för hand i klustret och finns inte i git (F18).
+        # Se docs/workshop-4.md, punkt 9.
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: company-website
+              key: secret-key
         livenessProbe:
           httpGet:
             path: /healthz

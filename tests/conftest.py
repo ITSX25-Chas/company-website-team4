@@ -1,4 +1,9 @@
+import os
+
 import pytest
+
+# Måste sättas innan appen importeras, eftersom Config läser miljön då.
+os.environ.setdefault('SECRET_KEY', 'test-secret-key-only-used-by-the-tests')
 
 from company_website import create_app
 from company_website.config import Config
