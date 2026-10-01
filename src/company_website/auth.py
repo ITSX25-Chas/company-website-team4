@@ -22,7 +22,9 @@ def load_user(user_id):
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     row = cursor.fetchone()
     conn.close()
-    if row:
+    # enabled kontrolleras vid varje anrop, inte bara vid inloggningen, så att
+    # ett konto som inaktiveras blir utloggat direkt (F59).
+    if row and row['enabled']:
         return User(
             str(row['id']),
             row['username'],
