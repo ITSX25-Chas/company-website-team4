@@ -34,6 +34,16 @@ spec:
             drop: ["ALL"]
         ports:
         - containerPort: 7000
+        # Uppmätt 2026-10-01: ~50 MiB i vila, 115 MiB som mest vid inloggningar
+        # i båda workers samtidigt (scrypt tar ~32 MiB per kontroll). Noden har
+        # lite ledigt minne (F7), så appen får inte kunna ta mer (F63). Ingen
+        # CPU-gräns, eftersom den bara skulle strypa inloggningarna.
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
 
         env:
         - name: FLASK_DEBUG
