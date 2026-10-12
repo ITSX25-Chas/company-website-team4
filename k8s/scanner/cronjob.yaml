@@ -7,7 +7,10 @@ metadata:
   name: sbom-vulnerability-scanner
   namespace: security-tools
 spec:
-  schedule: "0 6 * * *"
+  # Primary körs bara 08:00–00:00 (team4-daily-schedule i terraform-infra).
+  # Klockan 06 var klustret avstängt, och när det startade 08 hade
+  # startingDeadlineSeconds gått ut, så inget schemalagt jobb kördes.
+  schedule: "0 9 * * *"
   timeZone: Europe/Stockholm
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
