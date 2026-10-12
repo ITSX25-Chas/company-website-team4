@@ -7,9 +7,10 @@ spec:
   mode: enforce
   images:
   - glob: ghcr.io/jonity-itsx/sbom-scanner**
+  - glob: ghcr.io/itsx25-chas/sbom-scanner**
   authorities:
   - name: scanner-workflow
     keyless:
       identities:
       - issuer: https://token.actions.githubusercontent.com
-        subjectRegExp: ^https://github\.com/jonity-itsx/company-website/\.github/workflows/scanner-image\.yml@refs/heads/main$
+        subjectRegExp: ^https://github\.com/(jonity-itsx/company-website|(?i:itsx25-chas)/company-website-team4)/\.github/workflows/scanner-image\.yml@refs/heads/main$
