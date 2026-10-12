@@ -50,6 +50,10 @@ spec:
               value: /tmp
             - name: TRIVY_CACHE_DIR
               value: /cache
+            # Trivy laddar ner och packar upp sin databas (126 MiB komprimerad
+            # 2026-10-12) i TMPDIR. I /tmp (256Mi) vräktes podden.
+            - name: TMPDIR
+              value: /cache
             # Får Go att städa minnet innan gränsen nedan nås (noden har
             # bara ~500 MB ledigt, F7).
             - name: GOMEMLIMIT
