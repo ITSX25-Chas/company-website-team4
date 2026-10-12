@@ -36,5 +36,5 @@ def test_pages_have_no_inline_scripts(alice):
     # Med script-src 'self' skulle ett inline-skript blockeras och sidan sluta fungera.
     for url in pages(alice) + ['/login']:
         html = alice.get(url).get_data(as_text=True)
-        assert not re.search(r'<script(?![^>]*\bsrc=)[^>]*>', html), url
+        assert not re.search(r'<script(?![^>]*\bsrc=)[^>]*>', html, flags=re.IGNORECASE), url
         assert not re.search(r'\son[a-z]+=', html), url
