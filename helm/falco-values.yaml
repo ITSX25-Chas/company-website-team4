@@ -55,5 +55,6 @@ customRules:
           comps: ["=", "="]
           values:
             - [security-tools, ghcr.io/jonity-itsx/sbom-scanner]
+            - [security-tools, ghcr.io/itsx25-chas/sbom-scanner]
       override:
         exceptions: append

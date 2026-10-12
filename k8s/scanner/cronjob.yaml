@@ -7,7 +7,10 @@ metadata:
   name: sbom-vulnerability-scanner
   namespace: security-tools
 spec:
-  schedule: "0 6 * * *"
+  # Primary körs bara 08:00–00:00 (team4-daily-schedule i terraform-infra).
+  # Klockan 06 var klustret avstängt, och när det startade 08 hade
+  # startingDeadlineSeconds gått ut, så inget schemalagt jobb kördes.
+  schedule: "0 9 * * *"
   timeZone: Europe/Stockholm
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
@@ -43,12 +46,16 @@ spec:
               value: app=company-website
             # Samma identitet som i k8s/image-policy.yaml.
             - name: CERT_IDENTITY_REGEXP
-              value: ^https://github\.com/jonity-itsx/company-website/\.github/workflows/deploy\.yml@.*$
+              value: ^https://github\.com/(jonity-itsx/company-website|(?i:itsx25-chas)/company-website-team4)/\.github/workflows/deploy\.yml@.*$
             - name: CERT_OIDC_ISSUER
               value: https://token.actions.githubusercontent.com
             - name: HOME
               value: /tmp
             - name: TRIVY_CACHE_DIR
+              value: /cache
+            # Trivy laddar ner och packar upp sin databas (126 MiB komprimerad
+            # 2026-10-12) i TMPDIR. I /tmp (256Mi) vräktes podden.
+            - name: TMPDIR
               value: /cache
             # Får Go att städa minnet innan gränsen nedan nås (noden har
             # bara ~500 MB ledigt, F7).

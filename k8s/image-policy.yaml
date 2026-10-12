@@ -6,9 +6,10 @@ spec:
   mode: enforce
   images:
   - glob: ghcr.io/jonity-itsx/company-website**
+  - glob: ghcr.io/itsx25-chas/company-website-team4**
   authorities:
   - name: deploy-workflow
     keyless:
       identities:
       - issuer: https://token.actions.githubusercontent.com
-        subjectRegExp: ^https://github\.com/jonity-itsx/company-website/\.github/workflows/deploy\.yml@.*$
+        subjectRegExp: ^https://github\.com/(jonity-itsx/company-website|(?i:itsx25-chas)/company-website-team4)/\.github/workflows/deploy\.yml@.*$
