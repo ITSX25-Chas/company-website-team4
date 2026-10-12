@@ -43,7 +43,7 @@ spec:
               value: app=company-website
             # Samma identitet som i k8s/image-policy.yaml.
             - name: CERT_IDENTITY_REGEXP
-              value: ^https://github\.com/jonity-itsx/company-website/\.github/workflows/deploy\.yml@.*$
+              value: ^https://github\.com/(jonity-itsx/company-website|(?i:itsx25-chas)/company-website-team4)/\.github/workflows/deploy\.yml@.*$
             - name: CERT_OIDC_ISSUER
               value: https://token.actions.githubusercontent.com
             - name: HOME
