@@ -12,10 +12,12 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Copy the environment file and run the app:
+Copy the environment file, set a random `SECRET_KEY` in it and run the app.
+The app refuses to start without a key of at least 32 characters:
 
 ```bash
 cp .env.example .env
+python -c 'import secrets; print(secrets.token_hex(32))'   # paste into .env
 python wsgi.py
 ```
 
@@ -35,6 +37,9 @@ docker compose up --build
 ```
 
 The SQLite database is persisted in a Docker volume (`app-data`).
+
+In Kubernetes the key is read from the secret `company-website` (key
+`secret-key`), which is created by hand and is not stored in git.
 
 For Kubernetes (k3s), replace the Docker volume with a PersistentVolumeClaim pointing to `/app/data`.
 

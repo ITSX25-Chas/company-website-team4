@@ -275,7 +275,8 @@ body.is-authenticated {
     border-bottom: 1px solid var(--border-primary);
 }
 
-.profile-dropdown a {
+.profile-dropdown a,
+.profile-dropdown .dropdown-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -292,7 +293,8 @@ body.is-authenticated {
     font-family: inherit;
 }
 
-.profile-dropdown a svg {
+.profile-dropdown a svg,
+.profile-dropdown .dropdown-item svg {
     stroke: currentColor;
     stroke-width: 2;
     stroke-linecap: round;
@@ -301,8 +303,13 @@ body.is-authenticated {
     flex-shrink: 0;
 }
 
-.profile-dropdown a:hover {
+.profile-dropdown a:hover,
+.profile-dropdown .dropdown-item:hover {
     background: var(--bg-dropdown-hover);
+}
+
+.dropdown-form {
+    margin: 0;
 }
 
 /* Theme toggle row */

@@ -13,16 +13,48 @@ spec:
         app: company-website
         git.commit: ${GIT_COMMIT}
     spec:
+      # Appen anropar aldrig Kubernetes API och behöver ingen token (F35).
+      automountServiceAccountToken: false
+      # Samma användare som i Dockerfile. Volymens filer måste ägas av
+      # 10001, se docs/workshop-4.md, punkt 9 (F23).
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: web
         image: ${DEPLOY_IMAGE}
         imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 7000
+        # Uppmätt 2026-10-01: ~50 MiB i vila, 115 MiB som mest vid inloggningar
+        # i båda workers samtidigt (scrypt tar ~32 MiB per kontroll). Noden har
+        # lite ledigt minne (F7), så appen får inte kunna ta mer (F63). Ingen
+        # CPU-gräns, eftersom den bara skulle strypa inloggningarna.
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
 
         env:
         - name: FLASK_DEBUG
           value: "false"
+        # Secreten skapas för hand i klustret och finns inte i git (F18).
+        # Se docs/workshop-4.md, punkt 9.
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: company-website
+              key: secret-key
         livenessProbe:
           httpGet:
             path: /healthz
@@ -38,7 +70,14 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /app/data
+        # Filsystemet är skrivskyddat. Gunicorn behöver en skrivbar /tmp
+        # för workers hjärtslag.
+        - name: tmp
+          mountPath: /tmp
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: company-website-data
+      - name: tmp
+        emptyDir:
+          sizeLimit: 16Mi

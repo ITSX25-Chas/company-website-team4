@@ -1,19 +1,5 @@
-import pytest
-from company_website import create_app
 from company_website.models import User
-from company_website.routes import _contains_blocked_email_syntax, _render_email_preview
-
-
-@pytest.fixture
-def app():
-    app = create_app()
-    app.config['TESTING'] = True
-    return app
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
+from company_website.routes import _render_email_preview
 
 
 def test_index(client):
@@ -57,8 +43,3 @@ def test_email_preview_supports_profile_variables(app):
         )
 
     assert preview == 'Hello Ada Lovelace (ada@example.com, Engineer) - Placeholder Industries'
-
-
-@pytest.mark.parametrize('token', ['[]', "''", '()', 'dict', 'request'])
-def test_email_preview_filter_blocks_listed_tokens(token):
-    assert _contains_blocked_email_syntax(f'{{{{ value {token} }}}}')

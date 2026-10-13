@@ -1,6 +1,6 @@
 import re
 
-from flask import Blueprint, jsonify, render_template, render_template_string, redirect, url_for, request, flash
+from flask import Blueprint, jsonify, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from .db import get_db
 from .models import User
@@ -8,27 +8,22 @@ from .models import User
 main_bp = Blueprint('main', __name__)
 COMPANY_NAME = 'Placeholder Industries'
 EMAIL_PREVIEW_MAX_LENGTH = 200
-EMAIL_EXPRESSION_PATTERN = re.compile(r"{{(.*?)}}", re.DOTALL)
-EMAIL_BLOCKED_TOKEN_PATTERN = re.compile(
-    r"\[|\]|\(|\)|''|\"\"|\bdict\b|\brequest\b", re.IGNORECASE
-)
-
-
-def _contains_blocked_email_syntax(template):
-    return any(
-        EMAIL_BLOCKED_TOKEN_PATTERN.search(match.group(1))
-        for match in EMAIL_EXPRESSION_PATTERN.finditer(template)
-    )
+# Signaturen är text med platshållare, inte en Jinja-mall. Bara {{ namn }}
+# med ett av de tillåtna namnen byts ut, allt annat lämnas orört. Användarens
+# text får aldrig renderas som mall, eftersom den då körs på servern (F17).
+EMAIL_VARIABLE_PATTERN = re.compile(r"{{\s*(\w+)\s*}}")
 
 
 def _render_email_preview(template, user):
-    return render_template_string(
-        template,
-        firstname=user.first_name or '',
-        lastname=user.last_name or '',
-        email=user.email or '',
-        role=user.role or '',
-        company=COMPANY_NAME,
+    values = {
+        'firstname': user.first_name or '',
+        'lastname': user.last_name or '',
+        'email': user.email or '',
+        'role': user.role or '',
+        'company': COMPANY_NAME,
+    }
+    return EMAIL_VARIABLE_PATTERN.sub(
+        lambda match: values.get(match.group(1), match.group(0)), template
     )
 
 
@@ -91,8 +86,6 @@ def email_preview(id):
     email_template = request.form.get('email_template', '')
     if len(email_template) > EMAIL_PREVIEW_MAX_LENGTH:
         return "Email template is too long", 400
-    if _contains_blocked_email_syntax(email_template):
-        return jsonify(error='The signature template contains unsupported syntax.'), 400
 
     return jsonify(preview=_render_email_preview(email_template, user))
 
@@ -100,6 +93,11 @@ def email_preview(id):
 @main_bp.route('/profiles/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile(id):
+    # Bara ägaren får se och ändra sin profil. Formuläret visar även
+    # internal_notes, som inte ska synas för andra (F19).
+    if str(current_user.id) != str(id):
+        return "Forbidden", 403
+
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE id = ?", (id,))

@@ -5,6 +5,7 @@ services:
       - "7000:7000"
     environment:
       - FLASK_DEBUG=false
+      - SECRET_KEY=${SECRET_KEY:?Set SECRET_KEY in .env, see README.md}
     volumes:
       - app-data:/app/data
 

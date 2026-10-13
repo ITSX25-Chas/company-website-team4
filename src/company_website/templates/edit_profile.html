@@ -8,6 +8,7 @@
     <p>Editing profile for <strong>{{ user.first_name }} {{ user.last_name }}</strong> ({{ user.username }})</p>
 
     <form id="profileEditForm" method="POST" action="{{ url_for('main.edit_profile', id=user.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label class="form-label" for="first_name">First Name</label>
             <input class="form-input" type="text" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
@@ -52,42 +53,6 @@
         <p id="emailPreviewError" role="alert" hidden>Unable to generate the email preview. Please try again.</p>
         <pre id="emailPreviewContent" style="white-space: pre-wrap; overflow-wrap: anywhere;"></pre>
     </dialog>
-    <script>
-        const previewSignatureButton = document.getElementById('previewSignatureButton');
-        const emailSignatureInput = document.getElementById('email_signature');
-        const emailPreviewModal = document.getElementById('emailPreviewModal');
-        const emailPreviewContent = document.getElementById('emailPreviewContent');
-        const emailPreviewError = document.getElementById('emailPreviewError');
-
-        previewSignatureButton.addEventListener('click', async () => {
-            emailPreviewError.hidden = true;
-            emailPreviewContent.textContent = '';
-            const previewData = new FormData();
-            previewData.append('email_template', emailSignatureInput.value);
-
-            try {
-                const response = await fetch(previewSignatureButton.dataset.previewUrl, {
-                    method: 'POST',
-                    body: previewData,
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (!response.ok) throw new Error('Preview request failed');
-                const result = await response.json();
-                emailPreviewContent.textContent = result.preview;
-            } catch (error) {
-                emailPreviewError.hidden = false;
-            }
-
-            emailPreviewModal.showModal();
-        });
-
-        document.getElementById('emailPreviewClose').addEventListener('click', () => {
-            emailPreviewModal.close();
-        });
-
-        emailPreviewModal.addEventListener('click', (event) => {
-            if (event.target === emailPreviewModal) emailPreviewModal.close();
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/edit_profile.js') }}"></script>
 </div>
 {% endblock %}
