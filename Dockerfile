@@ -1,7 +1,7 @@
 # Basen är låst med digest, så att varje bygge utgår från exakt samma image.
 # Taggen står kvar för läsbarheten. Dependabot föreslår ny digest varje
 # vecka (.github/dependabot.yml).
-FROM python:3.13-slim@sha256:3dd7cc108ec1493442514f5c2a871af6af0ec31d768ff6e378a93340c3b3db5f
+FROM python:3.14-slim@sha256:a2b82f3c48559aa0a8446d9af49826b6e2b2016f4cd2afabfe6013ec53729170
 
 # Säkerhetsuppdateringar i Debian-basen kommer med vid varje bygge,
 # även när python-imagen inte har byggts om än (F36).
