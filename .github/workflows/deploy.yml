@@ -10,6 +10,7 @@ on:
       - "**.md"
       - "docs/**"
       - "helm/**"
+      - "cluster/**"
       - "k8s/image-policy.yaml"
       - "k8s/github-permissions.yaml"
       - "docker-compose.yml"

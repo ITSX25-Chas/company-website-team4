@@ -1,0 +1,18 @@
+# Värden för ingress-nginx (chart 4.15.1), samma som körs i klustret.
+# Installeras av cluster/bootstrap.sh.
+#
+# Noden har ingen lastbalanserare, så controllern lyssnar direkt på nodens
+# port 80 via hostPort, och servicen behöver bara vara intern.
+controller:
+  hostPort:
+    enabled: true
+  service:
+    type: ClusterIP
+  # Admission-webhooken stängs av för att spara minne på e2-small-noden (F7).
+  # Den validerar bara Ingress-syntax. Fel syns ändå när deployen
+  # applicerar ingress.yaml.
+  admissionWebhooks:
+    enabled: false
+  resources:
+    requests:
+      memory: 90Mi
